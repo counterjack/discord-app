@@ -6,6 +6,17 @@ logger = logging.getLogger(__name__)
 
 class RequestMessageHandler(object):
 
+    def _handler_for_help(self):
+        return """
+        - **To search on google, Use below. It will return top 5 results**
+        google <query> (Please use ! before the message)
+
+        - **To get the recent games searched, Use**
+        recent game (Please use ! before the message)
+
+        - **Say hi to bot**
+        hi"""
+
     def __init__(self, message: str):
         self.message = message
         self.user_message_lower = message.content.lower()
@@ -59,16 +70,16 @@ class RequestMessageHandler(object):
         if self.user_message_lower == "hi":
             return self._handler_for_hi()
 
-        if self.user_message_lower.find("!google") != -1:
+        elif self.user_message_lower.find("!google") != -1:
             try:
                 self._insert_game_in_db_if_exists()
             except Exception as e:
                 logger.error("Failed to insert game in redis. Error \n {e}")
             return self._handler_for_google_search()
 
-        if self.user_message_lower.find("!recent") != -1:
+        elif self.user_message_lower.find("!recent") != -1:
             return self._handler_for_recent_games()
+        elif self.user_message_lower == "help":
+            return f"{self._handler_for_help()}"
 
-        # if none of above criteria fullfill then return
-        return "We do not support these now but we will surely take these in consideration. Thank you"
 
