@@ -1,6 +1,8 @@
 from search import Search
 from redis_util import RedisUtil
+import logging
 
+logger = logging.getLogger(__name__)
 
 class RequestMessageHandler(object):
 
@@ -58,9 +60,15 @@ class RequestMessageHandler(object):
             return self._handler_for_hi()
 
         if self.user_message_lower.find("!google") != -1:
-            self._insert_game_in_db_if_exists()
+            try:
+                self._insert_game_in_db_if_exists()
+            except Exception as e:
+                logger.error("Failed to insert game in redis. Error \n {e}")
             return self._handler_for_google_search()
 
         if self.user_message_lower.find("!recent") != -1:
             return self._handler_for_recent_games()
+
+        # if none of above criteria fullfill then return
+        return "We do not support these now but we will surely take these in consideration. Thank you"
 
